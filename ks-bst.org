@@ -1,0 +1,183 @@
+#+title:   KigraSoft Binary Search Tree Library
+#+startup: show4levels
+
+Run M-x org-babel-tangle (C-c C-v t) to generate Guile Scheme code.
+Mark code sections with ':tangle no' to exclude them from export.
+
+* About
+
+Use :tangle-mode o755 for executable scripts
+
+* ks-bst.scm
+:PROPERTIES:
+:header-args:scheme: :tangle ks-bst.scm
+:END:
+
+** General setup code and program description
+
+*** Preamble
+
+#+begin_src scheme
+
+  ;; -*- mode: scheme -*-
+  #|
+  # KigraSoft Binary Search Tree Library (ks-bst)
+  # version 0.1
+  #
+  # Description: Qwerty...
+  #
+  # Usage: (import (ks-bst))
+  #
+  # NOTE: This file is generated from ks-bst.org.  Any updates to the
+  #       code should be made to that file.
+  |#
+
+#+end_src
+
+*** Library init, imports and exports
+
+#+begin_src scheme
+
+  (define-library (ks-bst)
+    (import (scheme base))
+    (import (scheme write))
+    (import (srfi srfi-9))
+    (export make insert print)
+    (begin
+
+#+end_src
+
+** Library definition
+
+*** BST Variable Structure
+
+The BST variable returned by make is an ordered list.
+
+The components of the list are interpreted as:
+- Key type - Intended: either 'int 'str or a custom option
+- Root node
+  
+*** make - BST Initialization
+
+#+begin_src scheme :tangle no
+
+  (define (make)
+    (list 'int '()))
+  
+#+end_src
+
+#+begin_src scheme
+
+  (define (make)
+    (cons 'int '()))
+  
+#+end_src
+
+*** Node Constructor
+
+BST nodes are ordered lists with the following components:
+- Key
+- Parent Node
+- Left Node (key is smaller)
+- Right Node (key is greater)
+- Datum
+
+  #+begin_src scheme
+
+    ;;(define (new-node key datum parent)
+    ;;  (list key parent '() '() datum))
+
+    ;;(define (get-node-key node)
+    ;;  (car node))
+
+    (define-record-type <node>
+      (make-node key root left right datum)
+      node?
+      (key    node-key)
+      (root   node-root   set-node-root!)
+      (left   node-left   set-node-left!)
+      (right  node-right  set-node-right!)
+      (datum  node-datum))
+
+    (define (new-node key datum root)
+      (make-node key root '() '() datum))
+
+    (define (get-node-key node)
+      (node-key node))
+
+  #+end_src
+  
+*** insert - BST Insertion
+
+#+begin_src scheme :tangle no
+
+  (define (insert bst datum)
+    (if (null? (cdr bst))
+        (set-cdr! bst (new-node (car datum) datum '()))))
+
+#+end_src
+
+#+begin_src scheme
+
+  (define (insert bst datum)
+    (if (null? (cdr bst))
+        (set-cdr! bst (new-node (car datum) datum '()))
+        (let tree-insert ((tree-root (cdr bst)))
+          (cond ((> (get-node-key tree-root) (car datum))
+                 (set-node-left! tree-root (new-node (car datum) datum tree-root)))
+                ((< (get-node-key tree-root) (car datum))
+                 (set-node-right! tree-root (new-node (car datum) datum tree-root)))))))
+
+#+end_src
+
+*** print - BST Print Tree
+
+#+begin_src scheme
+
+  (define (print bst)
+    (begin
+      (display bst)
+      (newline)
+      (display (get-node-key (cdr bst)))
+      (newline)
+      (print-tree (cdr bst))
+      (newline)))
+
+#+end_src
+
+#+begin_src scheme
+
+  (define (print-tree root-node)
+    (let ((print-node (lambda (current-node line-prefix)
+                        (display line-prefix)
+                        (display (node-key current-node))
+                        (display " - ")
+                        (display (node-datum current-node))
+                        (newline))))
+      (print-node root-node "")
+      (let print-current-tree ((current-root root-node)
+                               (current-prefix "->  "))
+        (if (not (null? (node-left current-root)))
+            (begin
+              (print-node (node-left current-root) current-prefix)
+              (print-current-tree (node-left current-root) (string-append "    " current-prefix))))
+        (if (not (null? (node-right current-root)))
+            (begin
+              (print-node (node-right current-root) current-prefix)
+              (print-current-tree (node-right current-root) (string-append "    " current-prefix)))))))
+
+#+end_src
+
+** Close library file
+
+*** Close library file
+
+#+begin_src scheme
+
+  ))
+  
+#+end_src
+
+
+
+
