@@ -36,6 +36,12 @@ Use :tangle-mode o755 for executable scripts
 
 *** Library init, imports and exports
 
+The library is single, self contained form.  This section begins the
+form, imports the necessary libraries, and declares the library
+exports.  It needs a matching at the end of the library code to close
+out the form.  Note the Guile implementation limits library
+definitions to one per file. (I have not tested this myself.)
+
 #+begin_src scheme
 
   (define-library (ks-bst)
@@ -51,20 +57,14 @@ Use :tangle-mode o755 for executable scripts
 
 *** BST Variable Structure
 
-The BST variable returned by make is an ordered list.
+The BST variable returned by make is a cons pair.
 
 The components of the list are interpreted as:
 - Key type - Intended: either 'int 'str or a custom option
-- Root node
+  At the moment the library only supports integer keys but will be expanded in the future
+- Root node - The next code section defines a node record type
   
-*** make - BST Initialization
-
-#+begin_src scheme :tangle no
-
-  (define (make)
-    (list 'int '()))
-  
-#+end_src
+**** FUNC: make - BST Initialization
 
 #+begin_src scheme
 
@@ -75,20 +75,22 @@ The components of the list are interpreted as:
 
 *** Node Constructor
 
-BST nodes are ordered lists with the following components:
-- Key
-- Parent Node
-- Left Node (key is smaller)
-- Right Node (key is greater)
-- Datum
+BST nodes are record type.  The implemenation here uses the Guile
+manual's description of r6rs records (which it recommends as the best
+record option).  I think this is the same as r7rs records, but I have
+not verified that yet.
+
+Record components:
+- key   - index which determines where the node is inserted
+- root  - a pointer back to root node of this node (aka parent Node)
+- left  - Left Branch Node (key is smaller)
+- right - Right Branch Node (key is greater)
+- Datum - The 'payload' of the tree structure.
+          Ideally this should not care about what kind of data is passed in
+
+**** DECL: node record
 
   #+begin_src scheme
-
-    ;;(define (new-node key datum parent)
-    ;;  (list key parent '() '() datum))
-
-    ;;(define (get-node-key node)
-    ;;  (car node))
 
     (define-record-type <node>
       (make-node key root left right datum)
@@ -99,55 +101,70 @@ BST nodes are ordered lists with the following components:
       (right  node-right  set-node-right!)
       (datum  node-datum))
 
-    (define (new-node key datum root)
-      (make-node key root '() '() datum))
-
-    (define (get-node-key node)
-      (node-key node))
-
   #+end_src
-  
-*** insert - BST Insertion
 
-#+begin_src scheme :tangle no
+**** FUNC: new-node
 
-  (define (insert bst datum)
-    (if (null? (cdr bst))
-        (set-cdr! bst (new-node (car datum) datum '()))))
-
-#+end_src
+This main function to create a new node with no branch nodes.
+(get-node-key is probably not necessary but need to eliminate it from rest of code before deleting)
 
 #+begin_src scheme
 
-  (define (insert bst datum)
+  (define (new-node key datum root)
+    (make-node key root '() '() datum))
+
+  (define (get-node-key node)
+    (node-key node))
+
+#+end_src
+
+*** BST Insertion
+
+Should be relatively standard binany search tree insertion algorithm.
+The calling code needs to provide the result of the make function
+(which includes the tree type and root node), the key for the inserted
+datum, and the datum.  Presumably the key is contained in the datum,
+but it is up to the calling code to pull out the key for insertion
+into the BST.
+
+**** FUNC: insert
+
+#+begin_src scheme
+
+  (define (insert bst key datum)
     (if (null? (cdr bst))
-        (set-cdr! bst (new-node (car datum) datum '()))
+        (set-cdr! bst (new-node key datum '()))
         (let tree-insert ((tree-root (cdr bst)))
-          (cond ((> (get-node-key tree-root) (car datum))
+          (cond ((> (get-node-key tree-root) key)
                  (if (null? (node-left tree-root))
-                     (set-node-left! tree-root (new-node (car datum) datum tree-root))
+                     (set-node-left! tree-root (new-node key datum tree-root))
                      (tree-insert (node-left tree-root))))
-                ((< (get-node-key tree-root) (car datum))
+                ((< (get-node-key tree-root) key)
                  (if (null? (node-right tree-root))
-                     (set-node-right! tree-root (new-node (car datum) datum tree-root))
+                     (set-node-right! tree-root (new-node key datum tree-root))
                      (tree-insert (node-right tree-root))))))))
 
 #+end_src
 
 *** print - BST Print Tree
 
+Print functions for displaying the BST structure.  These are mainly
+for diagnostics and testing.  (At the momement only a print of the
+tree structure is implemented.  Need to at least also do an ordered
+traversal)
+
+**** FUNC: print
+
 #+begin_src scheme
 
   (define (print bst)
     (begin
-      ;;(display bst)
-      ;;(newline)
-      ;;(display (get-node-key (cdr bst)))
-      ;;(newline)
       (print-tree (cdr bst))
       (newline)))
 
 #+end_src
+
+**** FUNC: print-tree
 
 #+begin_src scheme
 
@@ -173,6 +190,8 @@ BST nodes are ordered lists with the following components:
 #+end_src
 
 ** Close library file
+
+Necessary to complete the define-library form begun at the top of the file.
 
 *** Close library file
 
@@ -208,27 +227,45 @@ BST nodes are ordered lists with the following components:
     (define datum3 '(3 '("test3" "test33")))
     (define datum4 '(4 '("test4" "test44")))
     (define datum5 '(5 '("test5" "test55")))
-    ;;(write datum1)
-    ;;(newline)
-    ;;(write datum2)
-    ;;(newline)
-    ;; (insert tst '((1 ("test" "test2"))))
-    ;;(write "init tst: ")
-    ;;(newline)
-    ;;(write tst)
-    ;;(newline)
-    (insert tst datum1)
+    (insert tst 1 datum1)
     (print tst)
-    ;;(write tst)
-    ;;(newline)
-    ;;(write (cdr tst))
-    ;;(newline)
-    ;;(write (null? (cdr tst)))
-    ;;(newline)
-    (insert tst datum2)
-    (insert tst datum3)
-    (insert tst datum4)
-    (insert tst datum5)
+    (insert tst 2 datum2)
+    (insert tst 3 datum3)
+    (insert tst 4 datum4)
+    (insert tst 5 datum5)
+    (print tst))
+
+#+end_src
+
+** ks-bst-test-02.scm
+:PROPERTIES:
+:header-args:scheme: :tangle ks-bst-test-02.scm :tangle-mode o755
+:END:
+
+#+begin_src scheme
+
+  #!/usr/bin/env sh
+  # -*- mode: scheme -*-
+  exec guile --r7rs -e main -s "$0" "$@"
+  !#
+
+  (add-to-load-path (dirname (current-filename)))
+
+  (import (ks-bst))
+
+  (define tst (make))
+
+  (define (main args)
+    (insert tst 6 "test6")
+    (insert tst 1 "test1")
+    (insert tst 7 "test7")
+    (insert tst 3 "test3")
+    (insert tst 4 "test4")
+    (insert tst 8 "test8")
+    (insert tst 9 "test9")
+    (insert tst 0 "test0")
+    (insert tst 2 "test2")
+    (insert tst 5 "test5")
     (print tst))
 
 #+end_src
