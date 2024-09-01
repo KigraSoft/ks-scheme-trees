@@ -178,6 +178,49 @@ BST nodes are ordered lists with the following components:
   
 #+end_src
 
+* Tests
 
+** ks-bst-test-01.scm
+:PROPERTIES:
+:header-args:scheme: :tangle ks-bst-test-01.scm :tangle-mode o755
+:END:
 
+#+begin_src scheme
 
+  #!/usr/bin/env sh
+  # -*- mode: scheme -*-
+  exec guile --r7rs -e main -s "$0" "$@"
+  !#
+
+  (add-to-load-path (dirname (current-filename)))
+
+  (import (ks-bst))
+
+  (define tst (make))
+
+  (define (main args)
+    (define datum1 '(1 '("test1" "test11")))
+    (define datum2 '(2 '("test2" "test22")))
+    (define datum3 '(3 '("test3" "test33")))
+    (write datum1)
+    (newline)
+    (write datum2)
+    (newline)
+    ;; (insert tst '((1 ("test" "test2"))))
+    (write "init tst: ")
+    (newline)
+    (write tst)
+    (newline)
+    (insert tst datum2)
+    (print tst)
+    (write tst)
+    (newline)
+    (write (cdr tst))
+    (newline)
+    (write (null? (cdr tst)))
+    (newline)
+    (insert tst datum1)
+    (insert tst datum3)
+    (print tst))
+
+#+end_src
