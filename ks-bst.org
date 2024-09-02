@@ -1,5 +1,6 @@
 #+title:   KigraSoft Binary Search Tree Library
 #+startup: show4levels
+#+startup: indent
 
 Run M-x org-babel-tangle (C-c C-v t) to generate Guile Scheme code.
 Mark code sections with ':tangle no' to exclude them from export.
