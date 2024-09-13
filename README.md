@@ -32,7 +32,7 @@ Three functions are available so far:
 
 ## Implementation
 
-The code is currently being develop in a literate style using Emacs Org-mode.
+The code is currently being developed in a literate style using Emacs Org-mode.
 
 To extract the code, load it into Emacs and run M-x org-babel-tangle
 (C-c C-v t) to generate Guile Scheme code.
