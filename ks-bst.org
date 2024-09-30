@@ -49,7 +49,7 @@ definitions to one per file. (I have not tested this myself.)
     (import (scheme base))
     (import (scheme write))
     (import (srfi srfi-9))
-    (export make insert print)
+    (export make insert print get)
     (begin
 
 #+end_src
@@ -198,13 +198,13 @@ Get function for returning a datum stored with a particular key.
 
 #+begin_src scheme
 
-  (define (tree-get bst key)
+  (define (get bst key)
     (if (null? (cdr bst))
         null
         (let tree-search ((tree-root (cdr bst)))
           (cond ((null? tree-root)
-                 null)
-                ((eq (get-node-key tree-root) key)
+                 tree-root)
+                ((eqv? (get-node-key tree-root) key)
                  (node-datum tree-root))
                 ((> (get-node-key tree-root) key)
                  (tree-search (node-left tree-root)))
@@ -323,6 +323,23 @@ Necessary to complete the define-library form begun at the top of the file.
     (insert tst 2 "test2")
     (insert tst 5 "test5")
     (print tst)
-    (tree-get tst 1))
+    (display "Get datum for 6:  ")
+    (display (get tst 6))
+    (newline)
+    (display "Get datum for 1:  ")
+    (display (get tst 1))
+    (newline)
+    (display "Get datum for 9:  ")
+    (display (get tst 9))
+    (newline)
+    (display "Get datum for 5:  ")
+    (display (get tst 5))
+    (newline)
+    (display "Get datum for 2:  ")
+    (display (get tst 2))
+    (newline)
+    (display "Get datum for 18:  ")
+    (display (get tst 18))
+    (newline))
 
 #+end_src
