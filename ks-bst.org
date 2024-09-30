@@ -2,10 +2,10 @@
 #+startup: show4levels
 #+startup: indent
 
+* About
+
 Run M-x org-babel-tangle (C-c C-v t) to generate Guile Scheme code.
 Mark code sections with ':tangle no' to exclude them from export.
-
-* About
 
 Use :tangle-mode o755 for executable scripts
 
@@ -190,6 +190,29 @@ traversal)
 
 #+end_src
 
+*** get - get node from BST
+
+Get function for returning a datum stored with a particular key.
+
+**** FUNC: get
+
+#+begin_src scheme
+
+  (define (tree-get bst key)
+    (if (null? (cdr bst))
+        null
+        (let tree-search ((tree-root (cdr bst)))
+          (cond ((null? tree-root)
+                 null)
+                ((eq (get-node-key tree-root) key)
+                 (node-datum tree-root))
+                ((> (get-node-key tree-root) key)
+                 (tree-search (node-left tree-root)))
+                ((< (get-node-key tree-root) key)
+                 (tree-search (node-right tree-root)))))))
+
+#+end_src
+
 ** Close library file
 
 Necessary to complete the define-library form begun at the top of the file.
@@ -268,5 +291,38 @@ Necessary to complete the define-library form begun at the top of the file.
     (insert tst 2 "test2")
     (insert tst 5 "test5")
     (print tst))
+
+#+end_src
+** ks-bst-test-03.scm
+:PROPERTIES:
+:header-args:scheme: :tangle ks-bst-test-03.scm :tangle-mode o755
+:END:
+
+#+begin_src scheme
+
+  #!/usr/bin/env sh
+  # -*- mode: scheme -*-
+  exec guile --r7rs -e main -s "$0" "$@"
+  !#
+
+  (add-to-load-path (dirname (current-filename)))
+
+  (import (ks-bst))
+
+  (define tst (make))
+
+  (define (main args)
+    (insert tst 6 "test6")
+    (insert tst 1 "test1")
+    (insert tst 7 "test7")
+    (insert tst 3 "test3")
+    (insert tst 4 "test4")
+    (insert tst 8 "test8")
+    (insert tst 9 "test9")
+    (insert tst 0 "test0")
+    (insert tst 2 "test2")
+    (insert tst 5 "test5")
+    (print tst)
+    (tree-get tst 1))
 
 #+end_src
