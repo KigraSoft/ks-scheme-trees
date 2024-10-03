@@ -11,7 +11,7 @@ Use :tangle-mode o755 for executable scripts
 
 * ks-bst.scm
 :PROPERTIES:
-:header-args:scheme: :tangle ks-bst.scm
+:header-args:scheme: :tangle ./bin/ks-bst.scm
 :END:
 
 ** General setup code and program description
@@ -229,7 +229,7 @@ Necessary to complete the define-library form begun at the top of the file.
 
 ** ks-bst-test-01.scm
 :PROPERTIES:
-:header-args:scheme: :tangle ks-bst-test-01.scm :tangle-mode o755
+:header-args:scheme: :tangle ./bin/ks-bst-test-01.scm :tangle-mode o755
 :END:
 
 #+begin_src scheme
@@ -263,7 +263,7 @@ Necessary to complete the define-library form begun at the top of the file.
 
 ** ks-bst-test-02.scm
 :PROPERTIES:
-:header-args:scheme: :tangle ks-bst-test-02.scm :tangle-mode o755
+:header-args:scheme: :tangle ./bin/ks-bst-test-02.scm :tangle-mode o755
 :END:
 
 #+begin_src scheme
@@ -295,7 +295,7 @@ Necessary to complete the define-library form begun at the top of the file.
 #+end_src
 ** ks-bst-test-03.scm
 :PROPERTIES:
-:header-args:scheme: :tangle ks-bst-test-03.scm :tangle-mode o755
+:header-args:scheme: :tangle ./bin/ks-bst-test-03.scm :tangle-mode o755
 :END:
 
 #+begin_src scheme
