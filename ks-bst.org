@@ -100,7 +100,7 @@ Record components:
       (root   node-root   set-node-root!)
       (left   node-left   set-node-left!)
       (right  node-right  set-node-right!)
-      (datum  node-datum))
+      (datum  node-datum  set-node-datum!))
 
   #+end_src
 
@@ -128,9 +128,14 @@ datum, and the datum.  Presumably the key is contained in the datum,
 but it is up to the calling code to pull out the key for insertion
 into the BST.
 
-**** FUNC: insert
+**** FUNC: insert v1
 
-#+begin_src scheme
+Original function.  In this version any attempt to insert a duplicate
+key is silently ignored.  I'm keeping this version around for now in
+case I need to optimize the library where the function is chosen at
+initialization based on options supplied by the library user.
+
+#+begin_src scheme :tangle no
 
   (define (insert bst key datum)
     (if (null? (cdr bst))
@@ -143,6 +148,27 @@ into the BST.
                 ((< (get-node-key tree-root) key)
                  (if (null? (node-right tree-root))
                      (set-node-right! tree-root (new-node key datum tree-root))
+                     (tree-insert (node-right tree-root)))))))) 
+
+#+end_src
+
+**** FUNC: insert
+
+#+begin_src scheme
+
+  (define (insert bst key datum)
+    (if (null? (cdr bst))
+        (set-cdr! bst (new-node key (list datum) '()))
+        (let tree-insert ((tree-root (cdr bst)))
+          (cond ((eqv? (get-node-key tree-root) key)
+                 (set-node-datum! tree-root (append (list datum) (node-datum tree-root))))
+                ((> (get-node-key tree-root) key)
+                 (if (null? (node-left tree-root))
+                     (set-node-left! tree-root (new-node key (list datum) tree-root))
+                     (tree-insert (node-left tree-root))))
+                ((< (get-node-key tree-root) key)
+                 (if (null? (node-right tree-root))
+                     (set-node-right! tree-root (new-node key (list datum) tree-root))
                      (tree-insert (node-right tree-root))))))))
 
 #+end_src
@@ -337,6 +363,63 @@ Necessary to complete the define-library form begun at the top of the file.
     (newline)
     (display "Get datum for 2:  ")
     (display (get tst 2))
+    (newline)
+    (display "Get datum for 18:  ")
+    (display (get tst 18))
+    (newline))
+
+#+end_src
+** ks-bst-test-04.scm
+:PROPERTIES:
+:header-args:scheme: :tangle ./bin/ks-bst-test-04.scm :tangle-mode o755
+:END:
+
+#+begin_src scheme
+
+  #!/usr/bin/env sh
+  # -*- mode: scheme -*-
+  exec guile --r7rs -e main -s "$0" "$@"
+  !#
+
+  (add-to-load-path (dirname (current-filename)))
+
+  (import (ks-bst))
+
+  (define tst (make))
+
+  (define (main args)
+    (insert tst 6 "test6")
+    (insert tst 1 "test1")
+    (insert tst 7 "test7")
+    (insert tst 3 "test30")
+    (insert tst 3 "test31")
+    (insert tst 3 "test32")
+    (insert tst 3 "test33")
+    (insert tst 4 "test4")
+    (insert tst 8 "test80")
+    (insert tst 8 "test81")
+    (insert tst 9 "test9")
+    (insert tst 0 "test0")
+    (insert tst 2 "test2")
+    (insert tst 5 "test5")
+    (print tst)
+    (display "Get datum for 6:  ")
+    (display (get tst 6))
+    (newline)
+    (display "Get datum for 1:  ")
+    (display (get tst 1))
+    (newline)
+    (display "Get datum for 9:  ")
+    (display (get tst 9))
+    (newline)
+    (display "Get datum for 5:  ")
+    (display (get tst 5))
+    (newline)
+    (display "Get datum for 2:  ")
+    (display (get tst 2))
+    (newline)
+    (display "Get datum for 3:  ")
+    (display (get tst 3))
     (newline)
     (display "Get datum for 18:  ")
     (display (get tst 18))
