@@ -519,3 +519,73 @@ Necessary to complete the define-library form begun at the top of the file.
     (newline))
 
 #+end_src
+** ks-bst-test-06.scm
+:PROPERTIES:
+:header-args:scheme: :tangle ./bin/ks-bst-test-06.scm :tangle-mode o755
+:END:
+
+First test for using strings as the key value.  Initial run is a failure do to "<" not being able to compare strings.
+
+#+begin_src scheme
+
+  #!/usr/bin/env sh
+  # -*- mode: scheme -*-
+  exec guile --r7rs -e main -s "$0" "$@"
+  !#
+
+  (add-to-load-path (dirname (current-filename)))
+
+  (import (ks-bst))
+
+  (define tst (make))
+
+  (define (main args)
+    (insert tst "D" "testD")
+    (insert tst "A" "testA")
+    (insert tst 7 "test7")
+    (insert tst 3 "test30")
+    (insert tst 3 "test31")
+    (insert tst 3 "test32")
+    (insert tst 3 "test33")
+    (insert tst 4 "test4")
+    (insert tst 8 "test80")
+    (insert tst 8 "test81")
+    (insert tst 9 "test9")
+    (insert tst 0 "test0")
+    (insert tst 2 "test2")
+    (insert tst 5 "test5")
+    (print tst)
+    (display "Get datum for 6:  ")
+    (display (get tst 6))
+    (newline)
+    (display "Get datum for 1:  ")
+    (display (get tst 1))
+    (newline)
+    (display "Get datum for 9:  ")
+    (display (get tst 9))
+    (newline)
+    (display "Get datum for 5:  ")
+    (display (get tst 5))
+    (newline)
+    (display "Get datum for 2:  ")
+    (display (get tst 2))
+    (newline)
+    (display "Get datum for 3:  ")
+    (display (get tst 3))
+    (newline)
+    (display "Get datum for 18: ")
+    (display (get tst 18))
+    (newline)
+    (display "Get datum for 7:  ")
+    (display (get tst 7))
+    (newline)
+    (insert-or-replace tst 7 "test7--test7")
+    (display "Get datum for 7:  ")
+    (display (get tst 7))
+    (newline)
+    (insert-or-replace tst 18 "test18")
+    (display "Get datum for 18: ")
+    (display (get tst 18))
+    (newline))
+
+#+end_src
