@@ -65,13 +65,28 @@ The components of the list are interpreted as:
   At the moment the library only supports integer keys but will be expanded in the future
 - Root node - The next code section defines a node record type
   
-**** FUNC: make - BST Initialization
+**** FUNC: make - BST Initialization - v1
 
-#+begin_src scheme
+#+begin_src scheme :tangle no
 
   (define (make)
     (cons 'int '()))
   
+#+end_src
+
+**** FUNC: make - BST Initialization - v2
+
+#+begin_src scheme
+
+  (define (make . key-type-or-compare-function)
+    (cond ((or (null? key-type-or-compare-function)
+               (eq? 'int key-type-or-compare-function))
+           (cons '('int bst-int-compare) '()))
+          ((eq? 'str key-type-or-compare-function)
+           (cons '('str bst-str-compare) '()))
+          (else
+           (cons '('fun key-type-or-compare-function) '()))))
+
 #+end_src
 
 *** Node Constructor
@@ -117,6 +132,21 @@ This main function to create a new node with no branch nodes.
   (define (get-node-key node)
     (node-key node))
 
+#+end_src
+
+*** BST Compare Functions
+**** FUNC: bst-int-compare
+
+#+begin_src scheme
+
+  (define (bst-int-compare opr val1 val2)
+    (cond ((eq? opr #\<)
+           (< val1 val2))
+          ((eq? opr #\>)
+           (> val1 val2))
+          (else
+           (eq? val1 val2))))
+  
 #+end_src
 
 *** BST Insertion
