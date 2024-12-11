@@ -149,6 +149,20 @@ This main function to create a new node with no branch nodes.
   
 #+end_src
 
+**** FUNC: bst-str-compare
+
+#+begin_src scheme
+
+  (define (bst-str-compare opr val1 val2)
+    (cond ((eq? opr #\<)
+           (string<? val1 val2))
+          ((eq? opr #\>)
+           (string>? val1 val2))
+          (else
+           (eq? val1 val2))))
+  
+#+end_src
+
 *** BST Insertion
 
 Should be relatively standard binany search tree insertion algorithm.
@@ -183,6 +197,8 @@ initialization based on options supplied by the library user.
 #+end_src
 
 **** FUNC: insert
+
+! Need to update function below to use stored compare function
 
 #+begin_src scheme
 
@@ -280,7 +296,7 @@ Get function for returning a datum stored with a particular key.
 
   (define (get bst key)
     (if (null? (cdr bst))
-        null
+        '()
         (let tree-search ((tree-root (cdr bst)))
           (cond ((null? tree-root)
                  tree-root)
@@ -497,7 +513,7 @@ Necessary to complete the define-library form begun at the top of the file.
 
   (import (ks-bst))
 
-  (define tst (make))
+  (define tst (make 'int))
 
   (define (main args)
     (insert tst 6 "test6")
@@ -567,7 +583,7 @@ First test for using strings as the key value.  Initial run is a failure do to "
 
   (import (ks-bst))
 
-  (define tst (make))
+  (define tst (make 'str))
 
   (define (main args)
     (insert tst "D" "testD")
