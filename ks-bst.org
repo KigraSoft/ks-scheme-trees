@@ -222,24 +222,28 @@ initialization based on options supplied by the library user.
 
 **** FUNC: insert
 
-! Need to update function below to use stored compare function
-
 #+begin_src scheme
 
   (define (insert bst key datum)
     (if (null? (cdr bst))
         (set-cdr! bst (new-node key (list datum) '()))
-        (let tree-insert ((tree-root (cdr bst)))
-          (cond (((cadar bst) #\= (get-node-key tree-root) key)
-                 (set-node-datum! tree-root (append (list datum) (node-datum tree-root))))
-                (((cadar bst) #\> (get-node-key tree-root) key)
-                 (if (null? (node-left tree-root))
-                     (set-node-left! tree-root (new-node key (list datum) tree-root))
-                     (tree-insert (node-left tree-root))))
-                (((cadar bst) #\< (get-node-key tree-root) key)
-                 (if (null? (node-right tree-root))
-                     (set-node-right! tree-root (new-node key (list datum) tree-root))
-                     (tree-insert (node-right tree-root))))))))
+        (let ((compare (cadar bst)))
+          (let tree-insert ((tree-root (cdr bst)))
+            (cond
+             ((compare #\= (get-node-key tree-root) key)
+              (set-node-datum! tree-root (append
+                                          (list datum)
+                                          (node-datum tree-root))))
+             ((compare #\> (get-node-key tree-root) key)
+              (if (null? (node-left tree-root))
+                  (set-node-left! tree-root
+                                  (new-node key (list datum) tree-root))
+                  (tree-insert (node-left tree-root))))
+             ((compare #\< (get-node-key tree-root) key)
+              (if (null? (node-right tree-root))
+                  (set-node-right! tree-root
+                                   (new-node key (list datum) tree-root))
+                  (tree-insert (node-right tree-root)))))))))
 
 #+end_src
 
