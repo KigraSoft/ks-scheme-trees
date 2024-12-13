@@ -80,8 +80,6 @@ The components of the list are interpreted as:
 #+begin_src scheme
 
   (define (make . key-type-or-compare-function)
-    (display key-type-or-compare-function)
-    (newline)
     (cond
      ((or (null? key-type-or-compare-function)
           (eqv? 'int (car key-type-or-compare-function)))
